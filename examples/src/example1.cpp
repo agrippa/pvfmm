@@ -76,14 +76,15 @@ void fmm_test(size_t N, int mult_order, MPI_Comm comm){
   for(size_t i=0;i<surf_value.size();i++) surf_value[i]=drand48();
 
   // Create memory-manager (optional)
-  pvfmm::mem::MemoryManager mem_mgr(10000000);
+  // pvfmm::mem::MemoryManager mem_mgr(10000000);
 
   // Construct tree.
   size_t max_pts=600;
   pvfmm::PtFMM_Tree* tree=PtFMM_CreateTree(src_coord, src_value, surf_coord, surf_value, trg_coord, comm, max_pts, pvfmm::FreeSpace);
 
   // Load matrices.
-  pvfmm::PtFMM matrices(&mem_mgr);
+  // pvfmm::PtFMM matrices(&mem_mgr);
+  pvfmm::PtFMM matrices;
   matrices.Initialize(mult_order, comm, &kernel_fn);
 
   // FMM Setup
@@ -152,11 +153,30 @@ int main(int argc, char **argv){
   This example demonstrates solving a particle N-body problem,\n\
 with Laplace Gradient kernel, using the PvFMM library.\n");
   commandline_option_start(argc, argv);
-  omp_set_num_threads( atoi(commandline_option(argc, argv,  "-omp",     "1", false, "-omp  <int> = (1)    : Number of OpenMP threads."          )));
+  omp_set_num_threads( atoi(commandline_option(argc, argv,  "-t",     "1", false, "-t  <int> = (1)    : Number of OpenMP threads."          )));
   size_t   N=(size_t)strtod(commandline_option(argc, argv,    "-N",     "1",  true, "-N    <int>          : Number of source and target points."),NULL);
   int      m=       strtoul(commandline_option(argc, argv,    "-m",    "10", false, "-m    <int> = (10)   : Multipole order (+ve even integer)."),NULL,10);
   commandline_option_end(argc, argv);
   pvfmm::Profile::Enable(true);
+
+  int nthreads;
+#pragma omp parallel
+#pragma omp single
+  {
+      nthreads = omp_get_num_threads();
+  }
+
+  int rank, comm_size;
+  MPI_Comm_rank(comm, &rank);
+  MPI_Comm_size(comm, &comm_size);
+
+  if (rank == 0) {
+      fprintf(stderr, "Running with %d ranks, %d threads per rank, %lu "
+              "particles, multipole order of %d\n", comm_size, nthreads, N, m);
+  }
+  assert(N >= comm_size);
+
+  MPI_Barrier(comm);
 
   // Run FMM with above options.
   fmm_test(N, m, comm);

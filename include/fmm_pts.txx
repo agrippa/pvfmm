@@ -282,11 +282,12 @@ void FMM_Pts<FMMNode>::Initialize(int mult_order, const MPI_Comm& comm_, const K
   Profile::Tic("PrecompBC",&comm,false,4);
   { /*
     int type=BC_Type;
-    for(int l=0;l<MAX_DEPTH;l++)
-    for(size_t indx=0;indx<this->interac_list.ListCount((Mat_Type)type);indx++){
-      Matrix<Real_t>& M=this->mat->Mat(l, (Mat_Type)type, indx);
-      M.Resize(0,0);
-    } // */
+    for(int l=0;l<MAX_DEPTH;l++) {
+        for(size_t indx=0;indx<this->interac_list.ListCount((Mat_Type)type);indx++) {
+            Matrix<Real_t>& M=this->mat->Mat(l, (Mat_Type)type, indx);
+            M.Resize(0,0);
+        }
+      } */
   }
   this->PrecompAll(BC_Type,0);
   Profile::Toc();

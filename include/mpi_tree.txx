@@ -211,6 +211,7 @@ void MPI_Tree<TreeNode>::Initialize(typename Node_t::NodeData* init_data){
     Vector<Real_t>& pt_coord=rnode->pt_coord;
     size_t pt_cnt=pt_coord.Dim()/this->dim;
     pt_mid.Resize(pt_cnt);
+
     #pragma omp parallel for
     for(size_t i=0;i<pt_cnt;i++){
       pt_mid[i]=MortonId(pt_coord[i*COORD_DIM+0],pt_coord[i*COORD_DIM+1],pt_coord[i*COORD_DIM+2],this->max_depth);
