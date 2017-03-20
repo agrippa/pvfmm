@@ -144,6 +144,13 @@ inline PtFMM_Tree* PtFMM_CreateTree(std::vector<double>&  src_coord, std::vector
 }
 
 inline void PtFMM_Evaluate(PtFMM_Tree* tree, std::vector<double>& trg_val, size_t loc_size=0, std::vector<double>* src_val=NULL, std::vector<double>* surf_val=NULL){
+
+#if defined(PVFMM_HAVE_CUDA)
+    fprintf(stderr, "Using CUDA version\n");
+#else
+    fprintf(stderr, "Not using CUDA version\n");
+#endif
+
   if(src_val){
     std::vector<size_t> src_scatter_;
     std::vector<PtFMM_Node*>& nodes=tree->GetNodeList();

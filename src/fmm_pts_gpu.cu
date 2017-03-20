@@ -61,6 +61,7 @@ __global__ void out_perm_k(char* precomp_data, Real_t* output_data, char* buff_o
 template <class Real_t>
 void  in_perm_gpu_(char* precomp_data, Real_t*  input_data, char* buff_in , size_t*  input_perm, size_t vec_cnt, size_t M_dim0, cudaStream_t *stream){
   if (vec_cnt == 0) return;
+  fprintf(stderr, "Running GPU kernel\n");
   in_perm_k <Real_t><<<1024, 256, M_dim0*sizeof(Real_t), *stream>>>(precomp_data,  input_data, buff_in ,  input_perm, vec_cnt, M_dim0);
   cudaError_t error = cudaGetLastError();
   assert(error == cudaSuccess);
@@ -69,6 +70,7 @@ void  in_perm_gpu_(char* precomp_data, Real_t*  input_data, char* buff_in , size
 template <class Real_t>
 void out_perm_gpu_(char* precomp_data, Real_t* output_data, char* buff_out, size_t* output_perm, size_t vec_cnt, size_t M_dim1, cudaStream_t *stream){
   if (vec_cnt == 0) return;
+  fprintf(stderr, "Running GPU kernel\n");
   out_perm_k<Real_t><<<1024, 256, M_dim1*sizeof(Real_t), *stream>>>(precomp_data, output_data, buff_out, output_perm, vec_cnt, M_dim1);
   cudaError_t error = cudaGetLastError();
   assert(error == cudaSuccess);
